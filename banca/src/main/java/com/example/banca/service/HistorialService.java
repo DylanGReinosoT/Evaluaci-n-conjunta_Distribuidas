@@ -1,4 +1,4 @@
 package com.example.banca.service;
 
-public class HistorialService {
+public class HistorialService  {
 }
