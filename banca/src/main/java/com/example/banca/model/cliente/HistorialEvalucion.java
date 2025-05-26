@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "historial_evaluaciones")
@@ -17,59 +17,46 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class HistorialEvalucion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String nombre;
-
-    private int puntajeCrediticio;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Deuda> deudasActuales = new ArrayList<>();
+    private String clienteNombre; // Nombre del cliente en el momento de la evaluación
 
     @Column(nullable = false)
-    private double montoSolicitado;
+    private String tipoCliente; // "NATURAL" o "JURIDICA"
+
     @Column(nullable = false)
-    private int plazoEnMeses;
+    private double montoSolicitado; // El monto que se evaluó
 
+    @Column(nullable = false)
+    private int plazoEnMeses; // El plazo que se evaluó
 
-    protected void Cliente(String nombre, int puntajeCrediticio, double montoSolicitado, int plazoEnMeses) {
-        this.nombre = nombre;
-        this.puntajeCrediticio = puntajeCrediticio;
+    private String nivelRiesgo; // Resultado: "BAJO", "MEDIO", "ALTO"
+
+    private boolean aprobado; // Resultado: true/false
+
+    @Column(nullable = false)
+    private LocalDateTime fechaConsulta; // Cuándo se hizo la consulta
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = false) // Relación con la entidad Cliente
+    private Cliente cliente;
+
+    // Constructor para facilitar la creación desde el servicio
+    public HistorialEvalucion(String clienteNombre, String tipoCliente, double montoSolicitado,
+                              int plazoEnMeses, String nivelRiesgo, boolean aprobado,
+                              LocalDateTime fechaConsulta, Cliente cliente) {
+        this.clienteNombre = clienteNombre;
+        this.tipoCliente = tipoCliente;
         this.montoSolicitado = montoSolicitado;
         this.plazoEnMeses = plazoEnMeses;
-    }
-
-
-    public double getIngresoReferencial() {
-        return 0;
-    }
-
-    public boolean esAptoParaCredito() {
-        return false;
-    }
-
-
-    public double getMontoDeudas() {
-        if (this.deudasActuales == null || this.deudasActuales.isEmpty()) {
-            return 0.0;
-        }
-        return this.deudasActuales.stream()
-                .mapToDouble(Deuda::getMonto)
-                .sum();
-    }
-
-
-    public void addDeuda(Deuda deuda) {
-        this.deudasActuales.add(deuda);
-        deuda.setCliente(this);
-    }
-
-    public void removeDeuda(Deuda deuda) {
-        this.deudasActuales.remove(deuda);
-        deuda.setCliente(null);
+        this.nivelRiesgo = nivelRiesgo;
+        this.aprobado = aprobado;
+        this.fechaConsulta = fechaConsulta;
+        this.cliente = cliente;
     }
 }

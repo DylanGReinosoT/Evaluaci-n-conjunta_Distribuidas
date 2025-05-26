@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "deuda")
+@Table(name = "deudas")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +18,8 @@ import lombok.Setter;
 public class Deuda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // <<--- ID AÑADIDO AQUÍ
+
     @Column(nullable = false)
     private double monto;
 
